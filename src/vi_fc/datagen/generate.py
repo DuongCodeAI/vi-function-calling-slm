@@ -70,7 +70,10 @@ def seed_instruction(seed: Seed) -> dict:
         item["yeu_cau"] = f"Người dùng hỏi về luật giao thông: {seed.topic}. Hỏi tự nhiên như đang lái xe."
     elif sc == "chitchat":
         item["yeu_cau"] = (f"Người dùng nói chuyện ngoài lề: {seed.topic}. Thêm trường 'reply': trợ lý đáp 1-2 câu "
-                           "ngắn, thân thiện, KHÔNG dùng 'xin lỗi', 'không thể', không đặt câu hỏi lại.")
+                           "ngắn bằng tiếng Việt, thân thiện, KHÔNG dùng 'xin lỗi', 'không thể', không đặt câu hỏi "
+                           "lại. Việc trợ lý trên xe không làm được (đặt vé, đặt bàn...) hoặc cần tin mới (giá vàng, "
+                           "thời tiết, bóng đá...) thì nói nhẹ nhàng là mình chưa có thông tin đó / bạn xem trên điện "
+                           "thoại nhé. KHÔNG bịa thông tin, KHÔNG nói là đã làm xong.")
         item["truong"] = "user, reply"
     return item
 

@@ -175,3 +175,21 @@ def test_make_record_no_diacritics_folds_args():
     assert rec["gold"]["calls"][0]["arguments"] == {"destination": "ho guom"}
     assert "no_diacritics" in rec["style"] and rec["user_raw"] == "dẫn đường tới Hồ Gươm"
     assert "s9" in build_prompt([s])
+
+
+def test_text_quality_filters():
+    # các lỗi thật gặp ở đợt sinh đầu tiên
+    win = [{"name": "open_window", "arguments": {"percent": 50}}]
+    leak = _rec("Mở cửa sổ 50% đi, nhưng chưa nói cửa nào.", win, {"kind": "ask", "text": "Bạn muốn mở cửa sổ nào?"},
+                scenario="missing", omitted="position", omitted_value="driver")
+    assert "câu chép lại đề bài" in check_record(leak)
+    vol = [{"name": "set_volume", "arguments": {"level": 11}}]
+    eng = _rec("Can you set the volume to 11 for me please", vol, {"kind": "call", "calls": vol})
+    assert "câu gần như toàn tiếng Anh" in check_record(eng)
+    ok = _rec("Bật volume lên 11 đi", vol, {"kind": "call", "calls": vol})
+    assert check_record(ok) == []
+    fake = _rec("Đặt vé máy bay cho mình nhé", [], {"kind": "reply", "text": "Đã xong, vé của bạn đã được đặt."},
+                scenario="chitchat")
+    assert "chitchat bịa là đã làm / bịa thông tin" in check_record(fake)
+    en_reply = _rec("Bạn biết hát không?", [], {"kind": "reply", "text": "I can sing a little!"}, scenario="chitchat")
+    assert "chitchat trả lời không phải tiếng Việt" in check_record(en_reply)

@@ -50,6 +50,45 @@ def mentions_value(text: str, tool: str, arg: str, value) -> bool:
     return all(w in t for w in normalize(value).split())
 
 
+# Lỗi gặp khi đọc mẫu đợt sinh đầu (1000 seed, gpt-oss-120b):
+# - LLM chép luôn đề bài vào câu: "Mở cửa sổ 50% đi, nhưng chưa nói cửa nào."
+# - followup: lượt 'first' lại là câu hỏi của trợ lý ("Bạn muốn gọi cho ai?")
+# - code_switch thành cả câu tiếng Anh; chitchat trả lời bằng tiếng Anh
+# - chitchat bịa là đã làm ("Đã xong, chuyến bay của bạn đã được đặt") hoặc bịa tin ("đội XYZ")
+_LEAK = re.compile(r"(?<!\w)(chua|khong) (noi|neu|cho biet)(?!\w)|nguoi dung|tro ly hoi")
+_EN_FUNC = {"the", "and", "please", "can", "you", "my", "is", "it", "for", "of", "what", "how", "do", "now", "tell",
+            "if", "are", "your", "this", "that", "with", "be", "it's", "i'm", "want", "thanks", "to", "me", "i",
+            "a", "on", "in"}
+_FAKE_DONE = ("đã xong", "đã đặt", "đã được đặt", "đã book", "xyz")
+_VN_CHARS = re.compile(r"[à-ỹđ]")  # không dùng IGNORECASE: "ı" (trong khoảng này) khớp với "I"
+
+
+def mostly_english(text: str) -> bool:
+    words = re.findall(r"[a-z']+", text.lower())
+    n = sum(w in _EN_FUNC for w in words)
+    return n >= 3 and n / max(len(words), 1) >= 0.3
+
+
+def check_text_quality(rec: dict) -> list[str]:
+    problems = []
+    user_raw = rec.get("user_raw") or rec["user"]
+    first_raw = rec.get("first_raw", "")
+    for t in (user_raw, first_raw):
+        if t and _LEAK.search(normalize(t)):
+            problems.append("câu chép lại đề bài")
+        if t and normalize(t).startswith("ban muon"):
+            problems.append("câu người dùng lại là câu hỏi của trợ lý")
+    if mostly_english(user_raw + " " + first_raw):
+        problems.append("câu gần như toàn tiếng Anh")
+    if rec["scenario"] == "chitchat":
+        reply = rec["gold"].get("text", "")
+        if not _VN_CHARS.search(reply.lower()):
+            problems.append("chitchat trả lời không phải tiếng Việt")
+        if any(k in reply.lower() for k in _FAKE_DONE):
+            problems.append("chitchat bịa là đã làm / bịa thông tin")
+    return problems
+
+
 def check_record(rec: dict) -> list[str]:
     problems = []
     gold = Action.from_dict(rec["gold"])
@@ -85,7 +124,7 @@ def check_record(rec: dict) -> list[str]:
             problems.append("kịch bản thiếu slot nhưng câu vẫn nhắc giá trị")
     if sc == "followup" and not rec.get("history"):
         problems.append("followup thiếu history")
-    return problems
+    return problems + check_text_quality(rec)
 
 
 def _dedupe_text(rec: dict) -> str:

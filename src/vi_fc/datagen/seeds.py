@@ -28,7 +28,9 @@ SCENARIOS = {
 STYLES = {
     "standard": "câu bình thường, rõ ràng",
     "colloquial": "văn nói đời thường, có từ đệm (ơi, nhé, đi, xíu, cái), có thể nói trống không",
-    "code_switch": "chen từ tiếng Anh kiểu dân văn phòng (AC, volume, navigation, mode, fan, call, play)",
+    # bản đầu chỉ ghi "chen từ tiếng Anh" -> gpt-oss viết luôn cả câu tiếng Anh ("Call mom now")
+    "code_switch": "câu tiếng Việt, chỉ chen 1-3 từ tiếng Anh kiểu dân văn phòng (AC, volume, navigation, mode, fan, "
+                   "call, play); KHÔNG viết cả câu bằng tiếng Anh",
     "southern": "giọng miền Nam (nha, nghen, hen, máy lạnh, quẹo, mở nhạc, kêu)",
     "northern": "giọng miền Bắc (nhé, điều hoà, rẽ, bật, gọi cho)",
     "short": "ra lệnh rất ngắn, 3-7 chữ, vẫn đủ giá trị",
