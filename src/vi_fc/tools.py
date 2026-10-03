@@ -84,6 +84,13 @@ TOOL_NAMES = list(TOOLS_BY_NAME)
 # tham số là câu tự do: khi chấm điểm so bằng token F1 thay vì so khớp tuyệt đối
 FREE_TEXT_ARGS = {("lookup_traffic_law", "question"), ("set_reminder", "text")}
 
+# giá trị mặc định: "bật điều hoà" ra {} hay {"power": "on"} đều đúng -> bỏ trước khi so
+DEFAULTS = {("set_climate", "power"): "on", ("open_window", "percent"): 100}
+
+
+def canonical_args(name: str, args: dict) -> dict:
+    return {k: v for k, v in args.items() if DEFAULTS.get((name, k), object()) != v}
+
 
 def openai_tools(names: list[str] | None = None) -> list[dict]:
     """Dạng `tools=` cho apply_chat_template của Qwen3 và API kiểu OpenAI."""
