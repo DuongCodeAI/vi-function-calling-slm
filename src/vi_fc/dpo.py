@@ -139,12 +139,23 @@ def build_pairs(records: list[dict], seed: int = 0, per_record: int = 1) -> list
     return pairs
 
 
-def mine_on_policy(records: list[dict], predictions: list[Action | dict]) -> list[dict]:
-    """predictions[i] là output của model SFT cho records[i]. Giữ những câu model làm sai làm rejected.
-    Output không parse được thì giữ nguyên chuỗi raw: dạy model tránh cả lỗi format."""
+def _as_action(pred) -> Action:
+    if isinstance(pred, Action):
+        return pred
+    if "pred" in pred:  # một dòng của evaluate.predict: có cả chuỗi raw
+        a = Action.from_dict(pred["pred"])
+        a.raw = pred.get("raw", "")
+        return a
+    return Action.from_dict(pred)
+
+
+def mine_on_policy(records: list[dict], predictions: list) -> list[dict]:
+    """predictions[i] là output của model SFT cho records[i] (Action, dict Action, hoặc dòng của
+    evaluate.predict). Giữ những câu model làm sai làm rejected. Output hỏng format thì giữ nguyên chuỗi raw:
+    dạy model tránh cả lỗi format."""
     pairs = []
     for rec, pred in zip(records, predictions, strict=True):
-        pred = pred if isinstance(pred, Action) else Action.from_dict(pred)
+        pred = _as_action(pred)
         if not actions_match(Action.from_dict(rec["gold"]), pred) or not pred.valid_format:
             pairs.append(_pair(rec, pred, "on_policy"))
     return pairs

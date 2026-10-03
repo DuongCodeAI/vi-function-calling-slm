@@ -68,6 +68,9 @@ def test_mine_on_policy_keeps_only_mistakes():
     pairs = mine_on_policy(recs, [good, bad])
     assert len(pairs) == 1 and pairs[0]["type"] == "on_policy"
     assert "<tool_call>" in pairs[0]["rejected"]["content"]
+    # dòng output của evaluate.predict cũng dùng được trực tiếp
+    row = {"pred": bad.to_dict(), "raw": bad.raw}
+    assert mine_on_policy(recs[:1], [row])[0]["rejected"]["content"] == bad.raw
 
 
 def test_match_rules():
