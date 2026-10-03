@@ -94,7 +94,7 @@ python -m vi_fc.evaluate predict --data data/test_manual.jsonl --dataset manual 
 python -m vi_fc.evaluate report --preds results/preds --out results
 ```
 
-## Notebook (Kaggle, GPU T4)
+## Notebook (Kaggle hoặc Colab, GPU T4)
 
 | notebook | việc | phần cứng |
 |---|---|---|
@@ -104,6 +104,10 @@ python -m vi_fc.evaluate report --preds results/preds --out results
 | `04_export_eval` | GGUF q4_k_m, đánh giá 5 hệ thống | T4 + CPU |
 
 Unsloth cần GPU có CUDA capability ≥ 7.0: T4 được, P100 thì không.
+
+Chạy trên Colab: mở notebook từ GitHub (File → Open notebook → GitHub → DuongCodeAI/vi-function-calling-slm), chọn T4 GPU,
+thêm Secrets `GROQ_API_KEY`, `HF_TOKEN`, `GEMINI_API_KEY` (tuỳ chọn). Dữ liệu, adapter, bản merge và checkpoint lưu trên
+Google Drive (`MyDrive/ai-portfolio/vi-function-calling-slm`, cần ~10GB trống), bị ngắt thì chạy lại notebook là train tiếp.
 
 ## Hạn chế
 
