@@ -82,3 +82,13 @@ def test_match_rules():
                       ToolCall("lookup_traffic_law", {"question": "xe máy vượt đèn đỏ bị phạt bao nhiêu"}))
     assert not call_equal(ToolCall("navigate_to", {"destination": "Hồ Gươm", "avoid_tolls": False}),
                           ToolCall("navigate_to", {"destination": "Hồ Gươm"}))
+
+
+def test_fuzzy_place_and_music():
+    assert call_equal(ToolCall("play_music", {"query": "Đen Vâu"}), ToolCall("play_music", {"query": "nhạc Đen Vâu"}))
+    assert call_equal(ToolCall("navigate_to", {"destination": "sân bay Nội Bài"}),
+                      ToolCall("navigate_to", {"destination": "Nội Bài"}))
+    assert not call_equal(ToolCall("navigate_to", {"destination": "Hồ Gươm"}), ToolCall("navigate_to", {"destination": "Hồ Tây"}))
+    assert not call_equal(ToolCall("navigate_to", {"destination": "sân bay Nội Bài"}),
+                          ToolCall("navigate_to", {"destination": "Nội"}))
+    assert not call_equal(ToolCall("call_contact", {"name": "anh Tuấn"}), ToolCall("call_contact", {"name": "Tuấn"}))

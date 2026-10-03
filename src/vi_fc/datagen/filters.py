@@ -21,7 +21,7 @@ from ..parse import Action, classify_text
 from ..safety import check_calls
 from ..state import VehicleState
 from ..text import alnum, char_ngrams, jaccard, mentions_number, normalize
-from ..tools import FREE_TEXT_ARGS, validate_call
+from ..tools import validate_call
 from .seeds import seed_hash
 from .values import ALIASES, NUMBER_ALIASES
 
@@ -31,11 +31,11 @@ def _has_phrase(text: str, phrase: str) -> bool:
 
 
 def mentions_value(text: str, tool: str, arg: str, value) -> bool:
-    if (tool, arg) in FREE_TEXT_ARGS:
-        if arg == "text":  # nội dung nhắc việc: cho phép diễn đạt lại, chỉ cần nửa số từ xuất hiện
-            words = normalize(value).split()
-            return sum(w in normalize(text).split() for w in words) >= max(1, len(words) // 2)
-        return True
+    if (tool, arg) == ("lookup_traffic_law", "question"):
+        return True  # gold chính là câu người dùng
+    if (tool, arg) == ("set_reminder", "text"):  # nội dung nhắc việc: cho diễn đạt lại, cần nửa số từ xuất hiện
+        words = normalize(value).split()
+        return sum(w in normalize(text).split() for w in words) >= max(1, len(words) // 2)
     if (tool, arg) in ALIASES:
         return any(_has_phrase(text, a) for a in ALIASES[(tool, arg)].get(value, []))
     if isinstance(value, bool):

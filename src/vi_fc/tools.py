@@ -83,6 +83,8 @@ TOOL_NAMES = list(TOOLS_BY_NAME)
 
 # tham số là câu tự do: khi chấm điểm so bằng token F1 thay vì so khớp tuyệt đối
 FREE_TEXT_ARGS = {("lookup_traffic_law", "question"), ("set_reminder", "text")}
+# tên địa điểm / bài hát: "Đen Vâu" và "nhạc Đen Vâu" đều tìm ra đúng thứ cần -> chấm theo tập con từ
+NAME_ARGS = {("navigate_to", "destination"), ("play_music", "query")}
 
 # giá trị mặc định: "bật điều hoà" ra {} hay {"power": "on"} đều đúng -> bỏ trước khi so
 DEFAULTS = {("set_climate", "power"): "on", ("open_window", "percent"): 100}

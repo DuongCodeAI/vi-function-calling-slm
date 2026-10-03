@@ -4,12 +4,14 @@ Quy ước:
 - thứ tự các lệnh trong một câu không quan trọng ("bật điều hoà và mở nhạc" gọi cái nào trước cũng được),
 - tham số bằng giá trị mặc định coi như không có ({"power": "on"} == {}),
 - chuỗi so sau khi bỏ dấu + bỏ dấu câu (người dùng gõ không dấu thì model chép không dấu cũng đúng),
-- câu tự do (câu hỏi luật, nội dung nhắc) so bằng token F1 >= 0.5.
+- câu tự do (câu hỏi luật, nội dung nhắc) so bằng token F1 >= 0.5,
+- địa điểm / bài hát: từ của gold nằm trọn trong dự đoán ("nhạc Đen Vâu" ~ "Đen Vâu") hoặc ngược lại nhưng
+  không ngắn quá nửa ("Nội Bài" ~ "sân bay Nội Bài"). Không dùng F1 vì "Hồ Tây" vs "Hồ Gươm" đã được 0.5.
 """
 
 from .parse import Action, ToolCall
 from .text import alnum, normalize, token_f1
-from .tools import FREE_TEXT_ARGS, canonical_args
+from .tools import FREE_TEXT_ARGS, NAME_ARGS, canonical_args
 
 FREE_TEXT_MIN_F1 = 0.5
 
@@ -27,9 +29,18 @@ def _num(v):
     return None
 
 
+def _name_equal(gold: str, pred: str) -> bool:
+    g, p = set(normalize(gold).split()), set(normalize(pred).split())
+    if not g or not p:
+        return False
+    return g <= p or (p <= g and len(p) * 2 >= len(g))
+
+
 def arg_equal(tool: str, key: str, gold, pred) -> bool:
     if (tool, key) in FREE_TEXT_ARGS:
         return isinstance(pred, str) and token_f1(pred, str(gold)) >= FREE_TEXT_MIN_F1
+    if (tool, key) in NAME_ARGS:
+        return isinstance(pred, str) and _name_equal(str(gold), pred)
     if isinstance(gold, bool) or isinstance(pred, bool):
         return gold is pred
     g, p = _num(gold), _num(pred)
