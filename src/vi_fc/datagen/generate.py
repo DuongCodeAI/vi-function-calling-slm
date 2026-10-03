@@ -170,10 +170,15 @@ def generate(n: int, complete: Callable[[str, str], str], out_path: str | Path, 
                 items = parse_items(complete(SYSTEM, build_prompt(batch)))
             except Exception as e:  # lỗi mạng/quota: bỏ lô này, lần chạy sau làm lại
                 log.warning("lô %d lỗi: %s", b // batch_size, e)
+                if "mọi model" in str(e):
+                    log.warning("hết quota ngày, dừng. Mai chạy lại cell này là sinh tiếp.")
+                    break
                 continue
             for s in batch:
                 rec = make_record(s, items[s.id], aug_rng) if s.id in items else None
                 if rec:
+                    if getattr(complete, "model", None):
+                        rec["gen_model"] = complete.model  # biết câu nào do model nào viết (khi chuyển model)
                     f.write(json.dumps(rec, ensure_ascii=False) + "\n")
                     written += 1
             f.flush()
@@ -197,7 +202,13 @@ def main():
 
     load_dotenv()
     client = LLMClient(args.provider)
-    n = generate(args.n, lambda s, u: client.complete(s, u).text, args.out, args.seed, args.batch_size)
+
+    def call(system, user):
+        r = client.complete(system, user)
+        call.model = r.model
+        return r.text
+
+    n = generate(args.n, call, args.out, args.seed, args.batch_size)
     print(f"ghi thêm {n} bản ghi vào {args.out}")
 
 
