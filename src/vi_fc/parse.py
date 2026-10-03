@@ -120,7 +120,7 @@ def classify_text(text: str) -> str:
 
 def parse_output(raw: str) -> Action:
     text = _THINK.sub("", raw or "").replace("<think>", "").replace("</think>", "").strip()
-    text = text.replace("<|im_end|>", "").strip()
+    text = text.replace("<|im_end|>", "").replace("<|endoftext|>", "").strip()
 
     blocks = _TOOL_CALL.findall(text)
     rest = _TOOL_CALL.sub("", text)
