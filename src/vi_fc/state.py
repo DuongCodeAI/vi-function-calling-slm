@@ -1,7 +1,7 @@
 """Trạng thái xe tại thời điểm người dùng nói. Model cần biết để quyết định gọi hay từ chối.
 
 State được render vào lượt user (thẻ <xe>...</xe>) chứ không vào system prompt:
-system + schema tool là phần dài nhất (~1.5k token) và không đổi, giữ nguyên thì
+system + schema tool là phần dài nhất (~5 nghìn ký tự JSON) và không đổi, giữ nguyên thì
 llama.cpp tái dùng KV cache của prefix, mỗi lượt chỉ phải prefill vài chục token.
 """
 

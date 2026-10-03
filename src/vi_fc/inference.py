@@ -303,7 +303,7 @@ class FunctionCaller:
         return action
 
     def warmup(self) -> float:
-        """Prefill sẵn system + tools (~1.5k token) lúc khởi động để câu đầu tiên của người dùng không bị chậm."""
+        """Prefill sẵn system + tools (~5 nghìn ký tự) lúc khởi động để câu đầu tiên của người dùng không bị chậm."""
         t0 = time.perf_counter()
         self.backend.generate(build_messages("xin chào", None, None, self.system_prompt), self.tools, 1, 0.0)
         return time.perf_counter() - t0
