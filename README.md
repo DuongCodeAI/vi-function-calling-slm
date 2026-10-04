@@ -68,7 +68,7 @@ khớp đủ các lệnh trong câu nhiều lệnh, độ trễ.
 
 ```bash
 pip install -e ".[infer]"
-# tải GGUF từ HF Hub: DuongCodeAI/vi-fc-qwen3-1.7b-GGUF (sau khi chạy notebook 04)
+# tải GGUF từ HF Hub: <HF_USER>/vi-fc-qwen3-1.7b-GGUF (notebook 04 tạo dưới tài khoản của HF_TOKEN)
 python -m vi_fc.inference "bật điều hoà 22 độ ghế phụ" --model models/vi-fc-qwen3-1.7b-Q4_K_M.gguf --speed 40
 ```
 
@@ -99,14 +99,16 @@ python -m vi_fc.evaluate report --preds results/preds --out results
 | notebook | việc | phần cứng |
 |---|---|---|
 | `01_generate_data` | sinh + lọc dữ liệu, cặp DPO | CPU |
-| `02_sft_qlora` | SFT QLoRA r=16, 2 epoch, chỉ tính loss phần assistant | T4 |
+| `02_sft_qlora` | SFT QLoRA r=16, tối đa 2 epoch / ~40 phút, chỉ tính loss phần assistant | T4 |
 | `03_dpo` | DPO beta=0.1 trên bản SFT đã merge + lỗi on-policy | T4 |
 | `04_export_eval` | GGUF q4_k_m, đánh giá 5 hệ thống | T4 + CPU |
 
-Unsloth cần GPU có CUDA capability ≥ 7.0: T4 được, P100 thì không.
+Unsloth cần GPU có CUDA capability ≥ 7.0: T4 được, P100 thì không. Unsloth không cài/import được thì notebook tự
+chuyển sang transformers + peft + bitsandbytes (chậm hơn ~2 lần, số step tự giảm cho vừa giờ).
 
 Chạy trên Colab: mở notebook từ GitHub (File → Open notebook → GitHub → DuongCodeAI/vi-function-calling-slm), chọn T4 GPU,
-thêm Secrets `GROQ_API_KEY`, `HF_TOKEN`, `GEMINI_API_KEY` (tuỳ chọn). Dữ liệu, adapter, bản merge và checkpoint lưu trên
+thêm Secrets `GROQ_API_KEY`, `HF_TOKEN`, `GEMINI_API_KEY` (tuỳ chọn; repo HF tạo dưới tài khoản của token, đặt
+`HF_USER` nếu muốn đẩy vào org khác). Dữ liệu, adapter, bản merge và checkpoint lưu trên
 Google Drive (`MyDrive/ai-portfolio/vi-function-calling-slm`, cần ~10GB trống), bị ngắt thì chạy lại notebook là train tiếp.
 
 ## Hạn chế

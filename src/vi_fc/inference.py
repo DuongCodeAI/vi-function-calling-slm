@@ -103,6 +103,14 @@ class OpenAIBackend:
                          usage.get("completion_tokens", 0))
 
 
+def dtype_kw(dtype) -> dict:
+    """transformers >= 4.56 đổi torch_dtype= thành dtype= (tên cũ chỉ còn cảnh báo, bản sau sẽ bỏ)."""
+    import transformers
+    from packaging.version import Version
+
+    return {"dtype" if Version(transformers.__version__) >= Version("4.56") else "torch_dtype": dtype}
+
+
 class HFBackend:
     """transformers + (tuỳ chọn) LoRA adapter. Truyền sẵn model/tokenizer đã load (vd từ Unsloth) cũng được."""
 
@@ -112,7 +120,7 @@ class HFBackend:
             from transformers import AutoModelForCausalLM, AutoTokenizer
 
             tokenizer = tokenizer or AutoTokenizer.from_pretrained(model)
-            kw = {"torch_dtype": torch.float16, "device_map": "auto"}
+            kw = {**dtype_kw(torch.float16), "device_map": "auto"}
             if load_in_4bit:
                 from transformers import BitsAndBytesConfig
 

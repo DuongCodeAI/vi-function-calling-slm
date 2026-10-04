@@ -71,6 +71,9 @@ def test_mine_on_policy_keeps_only_mistakes():
     # dòng output của evaluate.predict cũng dùng được trực tiếp
     row = {"pred": bad.to_dict(), "raw": bad.raw}
     assert mine_on_policy(recs[:1], [row])[0]["rejected"]["content"] == bad.raw
+    # raw từ HFBackend còn token kết thúc: cắt đi, template tự thêm lại
+    row = {"pred": bad.to_dict(), "raw": bad.raw + "<|im_end|>"}
+    assert mine_on_policy(recs[:1], [row])[0]["rejected"]["content"] == bad.raw
 
 
 def test_match_rules():

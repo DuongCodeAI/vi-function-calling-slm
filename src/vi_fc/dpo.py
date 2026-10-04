@@ -118,7 +118,10 @@ def perturb(rec: dict, rng: random.Random) -> list[tuple[str, Action]]:
 
 def _pair(rec: dict, rejected: Action, kind: str) -> dict:
     if rejected.raw and not rejected.valid_format:
-        rej = {"role": "assistant", "content": rejected.raw}  # output hỏng format: giữ nguyên chuỗi
+        # output hỏng format: giữ nguyên chuỗi, chỉ cắt ở token kết thúc (raw của HF còn <|im_end|>, template
+        # lại tự thêm một cái nữa)
+        raw = rejected.raw.split("<|im_end|>")[0].split("<|endoftext|>")[0]
+        rej = {"role": "assistant", "content": raw}
     else:
         rej = assistant_message(rejected)
     return {
