@@ -1,7 +1,7 @@
 # vi-function-calling-slm
 
 Dạy một model nhỏ (Qwen3-1.7B) hiểu lệnh tiếng Việt trong xe và gọi đúng hàm, chạy **offline trên CPU laptop**
-bằng GGUF Q4_K_M (~1.1GB).
+bằng GGUF Q4_K_M (1,03 GB).
 
 Hành vi mong muốn (lấy từ bộ test viết tay):
 
