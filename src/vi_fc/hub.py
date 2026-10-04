@@ -39,3 +39,23 @@ def push(path: str, name: str, path_in_repo: str | None = None, repo_type: str =
         return None
     print("đã push", repo)
     return repo
+
+
+def pull(name: str, out: str, subdir: str | None = None, repo_type: str = "model", token: str | None = None) -> str:
+    """Ngược với push: tải repo (hoặc 1 thư mục con) về `out`. Dùng khi chạy Colab không mount được Drive,
+    output của notebook trước lấy lại từ Hub thay vì từ Drive."""
+    import shutil
+    import tempfile
+
+    from huggingface_hub import snapshot_download
+
+    token = token or os.environ.get("HF_TOKEN")
+    if subdir is None:
+        snapshot_download(repo_id(name, token), repo_type=repo_type, local_dir=out, token=token)
+        return out
+    tmp = tempfile.mkdtemp()
+    snapshot_download(repo_id(name, token), repo_type=repo_type, local_dir=tmp, token=token,
+                      allow_patterns=[f"{subdir}/*"])
+    shutil.rmtree(out, ignore_errors=True)
+    shutil.move(f"{tmp}/{subdir}", out)
+    return out
