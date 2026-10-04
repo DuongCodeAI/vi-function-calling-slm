@@ -50,16 +50,37 @@ seed do code bốc (kịch bản, tool, giá trị, trạng thái xe, văn phong
 (151 câu gần như toàn tiếng Anh, 86 câu người dùng lại hỏi như trợ lý, 25 câu chitchat bịa số liệu / bịa đã làm...)
 và 281 câu trùng, còn 1.390: train 1.141 / val 89 / test 160, cộng 1.141 cặp DPO.
 
-**Train**: đang chạy notebook 02-04 trên Colab T4. Bảng dưới điền từ `results/eval.md` của notebook 04,
-không điền số ước đoán.
+**Train** (Colab T4 free, 04/10/2026, mỗi bước có giới hạn thời gian nên đều dừng sớm):
+- SFT QLoRA r=16 (Unsloth): dừng ở step 65/131 (~0,9 epoch) sau 45 phút. Step 50: train loss 0.102, val loss 0.359.
+- DPO beta=0.1 trên bản SFT đã merge, 416 cặp (58 cặp lấy từ lỗi thật của model SFT trên 300 câu train, còn lại
+  là lỗi dựng sẵn: sai tool, bịa tool, sai giá trị, thiếu tham số...): dừng ở step 25/52 (~0,5 epoch) sau 25 phút.
+  Loss 0.687 → 0.428, reward accuracy 0.975, margin 0.67.
+- GGUF Q4_K_M: fp16 3.282 MiB → 1.050 MiB (1,03 GB, 5,12 bit/trọng số), trên HF `hgdkakhs/vi-fc-qwen3-1.7b-GGUF`.
 
-| system | kind acc | tool acc | args exact | ask R | refuse R | từ chối thừa | p50 (laptop) |
+**Đánh giá** (notebook 04, transformers fp16 trên T4, không bật guard; `results/eval.md`). Bộ viết tay đủ 45 câu,
+tập tổng hợp lấy mẫu cố định 30/160 câu cho vừa thời gian GPU:
+
+| system | tập | kind acc | tool acc | args exact | ask R | refuse R | từ chối thừa |
 |---|---|---|---|---|---|---|---|
-| Qwen3-1.7B gốc (prompt) | chưa chạy | | | | | | |
-| + SFT | chưa chạy | | | | | | |
-| + SFT + DPO | chưa chạy | | | | | | |
-| + SFT + DPO, GGUF Q4_K_M | chưa chạy | | | | | | |
-| Gemini (cận trên, chỉ để so) | chưa chạy | | | | | | |
+| Qwen3-1.7B gốc (prompt) | viết tay | 0.733 | 0.788 | 0.515 | 0 | 0 | 0 |
+| + SFT | viết tay | 0.756 | **0.970** | **0.909** | 0 | 0 | 0.024 |
+| + SFT + DPO | viết tay | **0.800** | 0.909 | 0.849 | **0.600** | **0.333** | 0.024 |
+| Qwen3-1.7B gốc (prompt) | tổng hợp | 0.700 | 0.850 | 0.550 | 0 | - | 0 |
+| + SFT | tổng hợp | 0.733 | 1.000 | 0.800 | 0.143 | - | 0.067 |
+| + SFT + DPO | tổng hợp | 0.667 | 0.950 | 0.800 | 0.143 | - | 0.067 |
+
+(30 câu tổng hợp không có câu nào phải từ chối nên refuse R để "-". Gemini không chạy: không có API key.)
+
+Đọc bảng:
+- **SFT dạy gọi đúng hàm và đúng tham số**: args exact trên bộ viết tay 0.515 → 0.909, tool acc 0.788 → 0.970.
+- **Nhưng SFT không dạy được hỏi lại / từ chối** (ask R, refuse R vẫn 0 trên bộ viết tay): dữ liệu có các ca này nhưng
+  0,9 epoch chưa đủ để model bỏ thói quen "cứ gọi tool".
+- **DPO sửa đúng chỗ đó**: hỏi lại khi thiếu thông tin 0 → 0.60, tự từ chối lệnh nguy hiểm 0 → 0.33, đổi lại args exact
+  giảm nhẹ (0.909 → 0.849). Chỗ còn thiếu do guard luật an toàn chặn sau output (bảng có guard trong `results/eval.md`:
+  không bản nào còn gọi tool không an toàn).
+- Tập nhỏ (45 + 30 câu) nên chênh lệch vài điểm là trong mức nhiễu; xu hướng SFT → tham số, DPO → hỏi lại/từ chối thì rõ.
+- Bản GGUF chưa có số: đánh giá trên CPU Colab (2 nhân, riêng warmup đã 101 s) quá chậm nên mình ngắt giữa chừng;
+  dòng `sft-dpo-q4km` trong `results/eval.md` chỉ có 30/45 câu, không dùng. Sẽ đo trên laptop cùng điều kiện với model gốc.
 
 Hai tập test: phần test của dữ liệu tổng hợp (chia theo seed, không trùng yêu cầu với train) và
 `data/test_manual.jsonl` — 45 câu mình tự viết theo cách mình nói thật trong xe, có đáp án viết tay.
