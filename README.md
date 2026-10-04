@@ -46,8 +46,12 @@ seed do code bốc (kịch bản, tool, giá trị, trạng thái xe, văn phong
 
 ## Kết quả
 
-**Chưa chạy.** Code và notebook đã xong, test local pass; phần sinh dữ liệu + train cần chạy trên Kaggle.
-Bảng dưới sẽ điền từ `results/eval.md` sau khi chạy notebook 04, không điền số ước đoán.
+**Dữ liệu** (notebook 01, Colab CPU, 04/10/2026; `data/gen/stats.json`): sinh 1.993 câu, bỏ 322 câu sai
+(151 câu gần như toàn tiếng Anh, 86 câu người dùng lại hỏi như trợ lý, 25 câu chitchat bịa số liệu / bịa đã làm...)
+và 281 câu trùng, còn 1.390: train 1.141 / val 89 / test 160, cộng 1.141 cặp DPO.
+
+**Train**: đang chạy notebook 02-04 trên Colab T4. Bảng dưới điền từ `results/eval.md` của notebook 04,
+không điền số ước đoán.
 
 | system | kind acc | tool acc | args exact | ask R | refuse R | từ chối thừa | p50 (laptop) |
 |---|---|---|---|---|---|---|---|
@@ -59,6 +63,16 @@ Bảng dưới sẽ điền từ `results/eval.md` sau khi chạy notebook 04, k
 
 Hai tập test: phần test của dữ liệu tổng hợp (chia theo seed, không trùng yêu cầu với train) và
 `data/test_manual.jsonl` — 45 câu mình tự viết theo cách mình nói thật trong xe, có đáp án viết tay.
+
+Đo sơ bộ model **gốc** (chưa fine-tune) trên laptop, GGUF Q4_K_M, llama.cpp CPU 4 luồng, 45 câu viết tay,
+04/10/2026. Lúc đo CPU đang chạy việc khác nên latency có thể cao hơn thật:
+
+| system | kind acc | tool acc | args exact | ask R | refuse R | gọi tool khi phải từ chối | p50 / p95 |
+|---|---|---|---|---|---|---|---|
+| Qwen3-1.7B gốc, Q4_K_M | 0.756 | 0.697 | 0.424 | 0 | 0 | 100% | 2.6 s / 6.5 s |
+
+Model gốc gọi tool khá được nhưng **không bao giờ hỏi lại hay từ chối**: câu nào thiếu thông tin cũng đoán bừa,
+câu không an toàn (mở khoá cửa khi xe chạy) vẫn gọi tool. Đây là phần fine-tune phải dạy.
 
 Metric (`vi_fc/evaluate.py`): đúng loại kết quả, đúng tool, đúng toàn bộ tham số, F1 theo tham số, tỉ lệ tool
 bịa, precision/recall của hỏi lại, recall từ chối + tỉ lệ vẫn gọi tool khi lẽ ra phải từ chối, tỉ lệ từ chối thừa,
@@ -110,6 +124,8 @@ Chạy trên Colab: mở notebook từ GitHub (File → Open notebook → GitHub
 thêm Secrets `GROQ_API_KEY`, `HF_TOKEN`, `GEMINI_API_KEY` (tuỳ chọn; repo HF tạo dưới tài khoản của token, đặt
 `HF_USER` nếu muốn đẩy vào org khác). Dữ liệu, adapter, bản merge và checkpoint lưu trên
 Google Drive (`MyDrive/ai-portfolio/vi-function-calling-slm`, cần ~10GB trống), bị ngắt thì chạy lại notebook là train tiếp.
+Không mount được Drive vẫn chạy được: dữ liệu có sẵn trong `data/gen`, adapter SFT đẩy lên HF ngay sau khi train
+để notebook 03/04 lấy về.
 
 ## Hạn chế
 
