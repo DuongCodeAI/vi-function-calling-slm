@@ -30,6 +30,8 @@ def push(path: str, name: str, path_in_repo: str | None = None, repo_type: str =
         repo = repo_id(name, token)
         api.create_repo(repo, repo_type=repo_type, exist_ok=True)
         if os.path.isdir(path):
+            # README peft tự sinh ghi base_model là path local (/content/work/...) -> Hub từ chối cả lần push
+            kw.setdefault("ignore_patterns", ["README.md"])
             api.upload_folder(folder_path=path, repo_id=repo, repo_type=repo_type, path_in_repo=path_in_repo, **kw)
         else:
             api.upload_file(path_or_fileobj=path, path_in_repo=path_in_repo or os.path.basename(path), repo_id=repo,
