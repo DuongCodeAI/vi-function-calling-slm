@@ -1,5 +1,14 @@
 # vi-function-calling-slm
 
+<!-- intro -->
+<p align="left">
+<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"> <img src="https://img.shields.io/badge/Qwen3--1.7B-6F42C1?style=for-the-badge" alt="Qwen3-1.7B"> <img src="https://img.shields.io/badge/QLoRA%20SFT%20+%20DPO-E74C3C?style=for-the-badge" alt="QLoRA SFT + DPO"> <img src="https://img.shields.io/badge/llama.cpp%20GGUF-000000?style=for-the-badge" alt="llama.cpp GGUF"> <a href="https://huggingface.co/hgdkakhs/vi-fc-qwen3-1.7b-GGUF"><img src="https://img.shields.io/badge/Hugging%20Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=white" alt="Hugging Face"></a>
+</p>
+
+> **Fine-tune LLM nhỏ gọi tool trong xe.** Qwen3-1.7B, QLoRA SFT + DPO, 17 tool, GGUF Q4_K_M chạy llama.cpp trên CPU. Dữ liệu tổng hợp 1.390 câu, nhãn sinh bằng code (không để LLM gán nhãn). Model gốc chưa fine-tune gọi tool khá được nhưng không bao giờ hỏi lại hay từ chối lệnh không an toàn. Trên 45 câu viết tay: SFT nâng args exact 0.52 → 0.91 nhưng vẫn không biết hỏi lại/từ chối; DPO dạy được hỏi lại khi thiếu thông tin (0/5 → 3/5 câu) và tự từ chối (0/3 → 1/3 câu; mẫu còn rất nhỏ), guard luật an toàn chặn nốt phần còn lại. Bản GGUF Q4 trên laptop (CPU 4 luồng): args exact 0.85, hỏi lại 2/5, p50 2.5 s; nhưng **không tự từ chối được** câu nào (0/3, bản fp16 được 1/3), nên guard luật cứng là lớp bảo vệ thật, không phải phụ.
+
+> Một phần của bộ 5 dự án [Trợ lý lái xe tiếng Việt chạy offline](https://github.com/DuongCodeAI) · tác giả: Tiến Dương
+
 Dạy một model nhỏ (Qwen3-1.7B) hiểu lệnh tiếng Việt trong xe và gọi đúng hàm, chạy **offline trên CPU laptop**
 bằng GGUF Q4_K_M (1,03 GB).
 
