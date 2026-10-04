@@ -86,6 +86,9 @@ def check_text_quality(rec: dict) -> list[str]:
             problems.append("chitchat trả lời không phải tiếng Việt")
         if any(k in reply.lower() for k in _FAKE_DONE):
             problems.append("chitchat bịa là đã làm / bịa thông tin")
+        elif re.search(r"\d", reply):
+            # trợ lý trên xe không có dữ liệu thời tiết / giá vàng: số trong câu đáp chitchat là bịa ("28 độ C")
+            problems.append("chitchat bịa số liệu")
     return problems
 
 

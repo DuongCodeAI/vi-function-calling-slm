@@ -193,3 +193,9 @@ def test_text_quality_filters():
     assert "chitchat bịa là đã làm / bịa thông tin" in check_record(fake)
     en_reply = _rec("Bạn biết hát không?", [], {"kind": "reply", "text": "I can sing a little!"}, scenario="chitchat")
     assert "chitchat trả lời không phải tiếng Việt" in check_record(en_reply)
+
+
+def test_chitchat_reply_with_numbers_is_fabricated():
+    rec = _rec("Thời tiết ngày mai thế nào?", [], {"kind": "reply", "text": "Ngày mai trời nắng nhẹ, khoảng 28 độ C."},
+               scenario="chitchat")
+    assert "chitchat bịa số liệu" in check_record(rec)
