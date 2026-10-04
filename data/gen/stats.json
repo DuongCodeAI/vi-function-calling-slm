@@ -1,0 +1,193 @@
+{
+ "raw": 1993,
+ "invalid": 322,
+ "duplicates": 281,
+ "invalid_reasons": {
+  "câu gần như toàn tiếng Anh": 151,
+  "câu người dùng lại là câu hỏi của trợ lý": 86,
+  "câu chép lại đề bài": 24,
+  "chitchat bịa số liệu": 15,
+  "chitchat bịa là đã làm / bịa thông tin": 10,
+  "text gold bị phân loại thành refuse thay vì reply": 6,
+  "câu không nhắc set_reminder.minutes": 5,
+  "text gold bị phân loại thành ask thay vì reply": 5,
+  "câu không nhắc open_window.percent": 4,
+  "câu không nhắc navigate_to.avoid_tolls": 2,
+  "chitchat trả lời không phải tiếng Việt": 2,
+  "câu không nhắc set_climate.zone": 2,
+  "câu không nhắc get_vehicle_status.field": 1,
+  "câu không nhắc navigate_to.destination": 1,
+  "câu không nhắc play_music.query": 1,
+  "câu không nhắc set_lights.mode": 1,
+  "câu không nhắc open_window.position": 1,
+  "câu không nhắc call_contact.name": 1,
+  "câu không nhắc set_fan_speed.level": 1,
+  "câu không nhắc set_volume.level": 1
+ },
+ "splits": {
+  "train": {
+   "n": 1141,
+   "scenario": {
+    "single": 461,
+    "multi": 164,
+    "law": 127,
+    "chitchat": 119,
+    "missing": 114,
+    "unsafe": 110,
+    "followup": 46
+   },
+   "kind": {
+    "call": 798,
+    "ask": 147,
+    "reply": 119,
+    "refuse": 77
+   },
+   "style": {
+    "colloquial": 214,
+    "standard": 169,
+    "southern": 156,
+    "code_switch": 132,
+    "northern": 124,
+    "short": 84,
+    "colloquial+no_diacritics": 40,
+    "southern+no_diacritics": 31,
+    "standard+no_diacritics": 27,
+    "colloquial+typo": 26,
+    "code_switch+no_diacritics": 22,
+    "standard+typo": 20,
+    "northern+no_diacritics": 18,
+    "short+no_diacritics": 16,
+    "northern+typo": 16,
+    "southern+typo": 10,
+    "code_switch+typo": 10,
+    "short+typo": 7,
+    "colloquial+no_diacritics+typo": 6,
+    "northern+no_diacritics+typo": 4,
+    "standard+no_diacritics+typo": 4,
+    "southern+no_diacritics+typo": 3,
+    "short+no_diacritics+typo": 1,
+    "code_switch+no_diacritics+typo": 1
+   },
+   "tools": {
+    "lookup_traffic_law": 127,
+    "set_volume": 64,
+    "set_fan_speed": 64,
+    "set_lights": 64,
+    "set_reminder": 63,
+    "call_contact": 62,
+    "get_vehicle_status": 58,
+    "set_drive_mode": 57,
+    "find_charging_station": 56,
+    "navigate_to": 56,
+    "set_climate": 54,
+    "play_music": 52,
+    "lock_doors": 47,
+    "open_window": 43,
+    "read_messages": 37,
+    "lookup_sign": 32,
+    "unlock_doors": 26
+   }
+  },
+  "val": {
+   "n": 89,
+   "scenario": {
+    "missing": 31,
+    "single": 23,
+    "law": 19,
+    "multi": 9,
+    "unsafe": 4,
+    "followup": 3
+   },
+   "kind": {
+    "call": 54,
+    "ask": 35
+   },
+   "style": {
+    "colloquial": 20,
+    "northern": 18,
+    "southern": 12,
+    "code_switch": 11,
+    "standard": 9,
+    "short": 7,
+    "standard+no_diacritics": 5,
+    "northern+no_diacritics": 2,
+    "southern+no_diacritics": 2,
+    "colloquial+no_diacritics+typo": 1,
+    "colloquial+typo": 1,
+    "northern+typo": 1
+   },
+   "tools": {
+    "lookup_traffic_law": 19,
+    "navigate_to": 9,
+    "find_charging_station": 6,
+    "open_window": 5,
+    "set_reminder": 5,
+    "call_contact": 4,
+    "read_messages": 4,
+    "play_music": 3,
+    "set_climate": 3,
+    "set_lights": 2,
+    "set_volume": 1,
+    "get_vehicle_status": 1,
+    "lock_doors": 1
+   }
+  },
+  "test": {
+   "n": 160,
+   "scenario": {
+    "law": 53,
+    "single": 46,
+    "missing": 24,
+    "multi": 19,
+    "followup": 7,
+    "chitchat": 6,
+    "unsafe": 5
+   },
+   "kind": {
+    "call": 125,
+    "ask": 29,
+    "reply": 6
+   },
+   "style": {
+    "colloquial": 29,
+    "short": 24,
+    "standard": 24,
+    "northern": 19,
+    "southern": 16,
+    "code_switch": 12,
+    "northern+no_diacritics": 6,
+    "colloquial+no_diacritics": 6,
+    "southern+typo": 3,
+    "southern+no_diacritics": 3,
+    "standard+no_diacritics": 3,
+    "standard+typo": 3,
+    "northern+typo": 2,
+    "colloquial+typo": 2,
+    "code_switch+no_diacritics": 2,
+    "short+no_diacritics": 2,
+    "southern+no_diacritics+typo": 1,
+    "code_switch+no_diacritics+typo": 1,
+    "colloquial+no_diacritics+typo": 1,
+    "code_switch+typo": 1
+   },
+   "tools": {
+    "lookup_traffic_law": 53,
+    "navigate_to": 14,
+    "play_music": 11,
+    "set_reminder": 10,
+    "open_window": 9,
+    "set_volume": 8,
+    "find_charging_station": 7,
+    "read_messages": 6,
+    "call_contact": 5,
+    "lookup_sign": 4,
+    "get_vehicle_status": 4,
+    "set_climate": 4,
+    "lock_doors": 3,
+    "set_fan_speed": 3,
+    "set_drive_mode": 2,
+    "set_lights": 1
+   }
+  }
+ }
+}

@@ -7,8 +7,7 @@ __pycache__/
 *.egg-info/
 .ipynb_checkpoints/
 
-# dữ liệu sinh ra + model -> để trên Kaggle / HF Hub, không commit
-data/gen/
+# model -> để trên HF Hub, không commit. data/gen (~2.4MB, dữ liệu tổng hợp) có commit để Colab không cần Drive
 models/
 *.gguf
 outputs/
