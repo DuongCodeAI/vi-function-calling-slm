@@ -84,8 +84,17 @@ tập tổng hợp lấy mẫu cố định 30/160 câu cho vừa thời gian GP
   `set_lights`, guard chỉ chặn lệnh gọi tool nên để nguyên câu hỏi. Không nguy hiểm (không bật/tắt gì), nhưng
   cho thấy model học hỏi lại và từ chối gần nhau, cần thêm cặp DPO phân biệt hai trường hợp này.
 - Tập nhỏ (45 + 30 câu) nên chênh lệch vài điểm là trong mức nhiễu; xu hướng SFT → tham số, DPO → hỏi lại/từ chối thì rõ.
-- Bản GGUF chưa có số: đánh giá trên CPU Colab (2 nhân, riêng warmup đã 101 s) quá chậm nên mình ngắt giữa chừng;
-  dòng `sft-dpo-q4km` trong `results/eval.md` chỉ có 30/45 câu, không dùng. Sẽ đo trên laptop cùng điều kiện với model gốc.
+- Dòng `sft-dpo-q4km` trong `results/eval.md` chỉ có 30/45 câu (CPU Colab 2 nhân quá chậm, mình ngắt giữa chừng), không dùng.
+
+**Bản GGUF Q4_K_M trên laptop** (llama.cpp CPU 4 luồng, 45 câu viết tay, 04/10/2026):
+
+| system | kind acc | tool acc | args exact | hỏi lại | từ chối | p50 / p95 |
+|---|---|---|---|---|---|---|
+| Qwen3-1.7B gốc, Q4_K_M | 0.756 | 0.697 | 0.424 | 0/5 | 0/3 | 2.6 s / 6.5 s (*) |
+| SFT + DPO, Q4_K_M | **0.800** | **0.939** | **0.848** | 2/5 | 0/3 | **2.5 s / 3.9 s** |
+
+(*) lúc đo model gốc CPU đang chạy việc khác. Lượng tử hoá Q4 giữ gần nguyên tham số đúng (0.849 fp16 → 0.848) nhưng
+mất bớt hỏi lại (3/5 → 2/5) và từ chối (1/3 → 0/3), nên trên laptop guard luật an toàn là lớp bắt buộc.
 
 Hai tập test: phần test của dữ liệu tổng hợp (chia theo seed, không trùng yêu cầu với train) và
 `data/test_manual.jsonl` — 45 câu mình tự viết theo cách mình nói thật trong xe, có đáp án viết tay.
