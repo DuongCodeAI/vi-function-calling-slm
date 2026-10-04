@@ -52,8 +52,9 @@ và 281 câu trùng, còn 1.390: train 1.141 / val 89 / test 160, cộng 1.141 c
 
 **Train** (Colab T4 free, 04/10/2026, mỗi bước có giới hạn thời gian nên đều dừng sớm):
 - SFT QLoRA r=16 (Unsloth): dừng ở step 65/131 (~0,9 epoch) sau 45 phút. Step 50: train loss 0.102, val loss 0.359.
-- DPO beta=0.1 trên bản SFT đã merge, 416 cặp (58 cặp lấy từ lỗi thật của model SFT trên 300 câu train, còn lại
-  là lỗi dựng sẵn: sai tool, bịa tool, sai giá trị, thiếu tham số...): dừng ở step 25/52 (~0,5 epoch) sau 25 phút.
+- DPO beta=0.1 trên bản SFT đã merge, 416 cặp: 58 cặp lấy từ lỗi thật của model SFT trên 300 câu train, cộng
+  358 cặp đầu trong 1.141 cặp dựng sẵn (sai tool, bịa tool, sai giá trị, thiếu tham số...). Số cặp chốt theo ngân sách
+  ~20 phút trên T4. Dừng ở step 25/52 (~0,5 epoch) sau 25 phút.
   Loss 0.687 → 0.428, reward accuracy 0.975, margin 0.67.
 - GGUF Q4_K_M: fp16 3.282 MiB → 1.050 MiB (1,03 GB, 5,12 bit/trọng số), trên HF `hgdkakhs/vi-fc-qwen3-1.7b-GGUF`.
 
@@ -75,9 +76,13 @@ tập tổng hợp lấy mẫu cố định 30/160 câu cho vừa thời gian GP
 - **SFT dạy gọi đúng hàm và đúng tham số**: args exact trên bộ viết tay 0.515 → 0.909, tool acc 0.788 → 0.970.
 - **Nhưng SFT không dạy được hỏi lại / từ chối** (ask R, refuse R vẫn 0 trên bộ viết tay): dữ liệu có các ca này nhưng
   0,9 epoch chưa đủ để model bỏ thói quen "cứ gọi tool".
-- **DPO sửa đúng chỗ đó**: hỏi lại khi thiếu thông tin 0 → 0.60, tự từ chối lệnh nguy hiểm 0 → 0.33, đổi lại args exact
-  giảm nhẹ (0.909 → 0.849). Chỗ còn thiếu do guard luật an toàn chặn sau output (bảng có guard trong `results/eval.md`:
-  không bản nào còn gọi tool không an toàn).
+- **DPO sửa đúng chỗ đó**: hỏi lại khi thiếu thông tin 0/5 → 3/5 câu, tự từ chối lệnh nguy hiểm 0/3 → 1/3 câu, đổi lại
+  args exact giảm nhẹ (0.909 → 0.849). Mẫu số rất nhỏ (bộ viết tay chỉ có 5 câu cần hỏi lại, 3 câu cần từ chối) nên
+  đây là tín hiệu, chưa phải số đo chắc chắn.
+- Guard luật an toàn chặn sau output: không bản nào còn gọi tool không an toàn. Nhưng refuse R sau guard của SFT+DPO
+  là 2/3 chứ không phải 3/3: câu "tắt đèn đi chói mắt quá" lúc trời tối, model DPO **hỏi lại** thay vì gọi
+  `set_lights`, guard chỉ chặn lệnh gọi tool nên để nguyên câu hỏi. Không nguy hiểm (không bật/tắt gì), nhưng
+  cho thấy model học hỏi lại và từ chối gần nhau, cần thêm cặp DPO phân biệt hai trường hợp này.
 - Tập nhỏ (45 + 30 câu) nên chênh lệch vài điểm là trong mức nhiễu; xu hướng SFT → tham số, DPO → hỏi lại/từ chối thì rõ.
 - Bản GGUF chưa có số: đánh giá trên CPU Colab (2 nhân, riêng warmup đã 101 s) quá chậm nên mình ngắt giữa chừng;
   dòng `sft-dpo-q4km` trong `results/eval.md` chỉ có 30/45 câu, không dùng. Sẽ đo trên laptop cùng điều kiện với model gốc.
