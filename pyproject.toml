@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Gọi hàm (function calling) tiếng Việt trong xe: chưng cất từ LLM lớn sang Qwen3-1.7B chạy offline bằng GGUF"
 readme = "README.md"
 requires-python = ">=3.10"
+license = "MIT"
 authors = [{ name = "Tiến Dương", email = "duongcodeai2@gmail.com" }]
 dependencies = [
     "requests>=2.31",
@@ -14,12 +15,12 @@ dependencies = [
 [project.optional-dependencies]
 # chạy GGUF trên CPU laptop
 infer = ["llama-cpp-python>=0.3"]
-# chỉ cài trên Kaggle (GPU T4), CI và laptop không cần
+# chỉ cài trên Colab (GPU T4), CI và laptop không cần
 train = ["unsloth", "trl>=0.19", "transformers>=4.51", "peft", "datasets", "bitsandbytes"]
 dev = ["pytest>=8", "ruff>=0.5"]
 
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
